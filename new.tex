@@ -1,0 +1,46 @@
+\documentclass[math,code]{amznotes}
+
+\usepackage{lipsum}     % filler text
+\usepackage[english]{babel}  % set the language to English
+\usepackage{graphicx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usepackage{anyfontsize}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{calc}
+\definecolor{mycolor}{HTML}{dfe6e9}
+\setminted{tabsize=4, bgcolor=mycolor}
+\title{Notes of Machine Learning Specialization}
+\author{FlowerMouse}
+\date{\today}
+\setlength{\parindent}{2em}
+
+\begin{document}
+    \frontmatter
+    \maketitle
+    \thispagestyle{empty}
+    \pagenumbering{arabic}
+    \include{preface}
+    \tableofcontents
+
+    \mainmatter
+    \part{Supervised Machine Learning: \\ Regression and Classification}
+    \include{chapter1}
+    \include{chapter2}
+    \include{chapter3}
+    \include{chapter4}
+    \include{chapter5}
+    \include{chapter6}
+    \include{chapter7}
+    \part{Advanced Machine Learning Algorithms}
+    \include{chapter8}
+    \include{chapter9}
+    \include{chapter10}
+    \include{chapter11}
+    \part{Unsupervised Learning, \\Recommender Systems and\\ Reinforcement Learning}
+    \include{kmeans}
+    \include{anomaly}
+    \include{pca}
+    \backmatter
+    \amzindex
+\end{document}

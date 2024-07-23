@@ -1,0 +1,82 @@
+\chapter{Tips for Gradient Descent}
+\section{Feature scaling}
+\includegraphics*[width=\textwidth]{images/2.4 (8)}
+\vspace{2em}
+\includegraphics*[width=\textwidth]{images/2.4 (7)}
+\includegraphics*[width=\textwidth]{images/2.4 (4)}
+
+\section{Normalization}
+
+\subsection*{Mean normalization}
+\begin{thmbox}{mean normalization}{mn}
+\textbf{for each feature $x_i$}
+\begin{equation}
+    x_i = \frac{{x_i} - \mu_i}{\max - \min}
+\end{equation}
+$\mu_i$ is the average value of $x_i$
+\end{thmbox}
+\includegraphics*[width=\textwidth]{images/2.4 (5)}
+
+\subsection*{Z-score normalization}
+\begin{thmbox}{z-score normalization}{zn}
+\textbf{for each feature $x_i$}
+\begin{equation}
+    x_i = \frac{{x_i} - \mu_i}{\sigma_i}
+\end{equation}
+$\mu_i$ is the average value of $x_i$, $\sigma_i$ is the standard deviation of $x_i$
+\begin{align*}
+    \mu_i &= \frac{1}{m} \sum_{j=1}^{m} x_i^{(j)} \\
+    \sigma_i &= \sqrt{\frac{1}{m} \sum_{j=1}^{m} (x_i^{(j)} - \mu_i)^2}
+\end{align*}
+\end{thmbox}
+\includegraphics*[width=\textwidth]{images/2.4 (6)}
+
+\section{Check the convergence}
+\paragraph*{the cost versus iterations gragh}
+A plot of cost versus iterations is a useful measure of %
+progress in gradient descent. Cost should always decrease %
+in successful runs. The change in cost is so rapid initially, %
+it is useful to plot the initial decent on a different scale than the final descent. %
+In the plots below, note the scale of cost on the axes and the iteration step.
+
+\includegraphics*[width=\textwidth]{images/2.4 (3)}
+
+\section{Choose learning rate}
+\includegraphics*[width=\textwidth]{images/2.4 (2)}
+\includegraphics*[width=\textwidth]{images/2.4}
+
+\section{Polynomial regression}
+\begin{dfnbox}{Polynomial regression}{pr}
+    \hspace{2em}\dfntxt{Polynomial regression} is a form of regression analysis %
+in which the relationship between the independent variable $x$ and the %
+dependent variable $y$ is modelled as an $n$th degree polynomial in $x$.
+\end{dfnbox}
+
+\begin{exbox}{Polynomial regression}{pr}
+    \hspace{2em}consider the following data:
+    assume $f_{(w, b)} = w \cdot x^2 + b$\par
+    \hspace{2em}By looking at the data, we can see that the data is not linear, so we can use polynomial regression to fit the data.\par
+    \hspace{2em}So we choose a new feature $x^2$ and apply linear regression to the new feature.(feature engnieering).
+\end{exbox}
+
+\subsection*{Feature engineering}
+\begin{enumerate}
+    \item first, we need to normalize the features.
+    \item Usually, it is hard to know which feature to use, so we can try different features and see which one fits the data best.
+    \item for example, we can try $x^2$, $x^3$, $x^4$, $x^5$ and so on.
+    \item so the hypothesis function will be $f_{(w, b)} = w_1 \cdot x + w_2 \cdot x^2 + w_3 \cdot x^2 + b$
+    \item apply linear regression to the new feature.
+    \item Eventally, we can get the funtions looks like this for this example: $ f_{(w, b)} = 0.08x + 0.54x^2 + 0.03x^3 + 0.0106 $
+    \item Let's review this idea:
+    \begin{enumerate}
+        \item Intially, the features were re-scaled so they are comparable to each other
+        \item less weight value implies less important/correct feature, and in extreme, when the weight becomes zero or very close to zero, the associated feature useful in fitting the model to the data.
+        \item above, after fitting, the weight associated with the $x^2$ feature is much larger than the weights for $x$ or $x^3$ as it is the most useful in fitting the data. 
+    \end{enumerate}
+\end{enumerate}
+
+\vspace{2em}
+\begin{notebox}
+    \hspace{2em}the essence of polynomial regression is to use linear regression to fit the data, but with the help of feature engineering, we can fit the data better.\par
+    \hspace{2em}even when we create new features, we still use linear regression to fit the data.
+\end{notebox}

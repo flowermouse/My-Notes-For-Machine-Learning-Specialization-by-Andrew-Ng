@@ -1,0 +1,73 @@
+\chapter{The problem of overfitting}
+\section{Overfitting}
+\begin{dfnbox}{overfitting}{of}
+    \begin{itemize}
+        \item \textbf{overfitting}: the model is too complex (high variance)
+        \item \textbf{underfitting}: the model is too simple (high bias)
+        \item the model is just right: the model generalizes well (regularization)
+    \end{itemize}
+\end{dfnbox}
+\subsection*{regression}
+\includegraphics*[width=\textwidth]{images/7.1 (2).jpg}
+\subsection*{classification}
+\includegraphics*[width=\textwidth]{images/7.1 (1).jpg}
+
+\section{Addressing overfitting}
+\subsection*{options}
+\begin{enumerate}
+    \item \textbf{increase the number of training examples}
+    \item \textbf{reduce the number of features}
+    \item \textbf{regularization}, reduce the size of the parameters.
+\end{enumerate}
+
+\subsection*{understanding of regularization}
+\hspace{2em}By deacreasing the size of the parameters, 
+we can reduce the complexity of the model. So the decision boundary will become more smooth,
+which will addressing overfitting.\par
+\hspace{2em}We want to deacrease the size of certain parameters,
+ but we don't know which ones.
+  So we add a term to the cost function to penalize the size of the parameters.\\
+
+\begin{notebox}
+    notice that the bias term $b$ is not included in the regularization term.
+\end{notebox}
+
+\section{Regularization}
+\subsection{regularization for linear regression}
+\subsubsection*{cost function}
+\begin{thmbox}{regularization cost function}{cf}
+    we can modify the cost function as follows:
+    \begin{equation}
+        J(\mathbf{w}, b) = \frac{1}{2m}\sum_{i=1}^{m}\left(f_{\mathbf{w}, b}\left(\mathbf{x}^{(i)}\right) - y^{(i)}\right)^2 + \frac{\lambda}{2m}\sum_{j=1}^{n}w_j^2
+    \end{equation}
+    by adding the term $\frac{\lambda}{2m}\sum_{j=1}^{n}w_j^2$ to the cost function, we can penalize the size of the parameters.
+\end{thmbox}
+\subsubsection*{gradient descent}
+\begin{thmbox}{regularization gradient descent}{gd}
+    \begin{align}
+        w_j &:= w_j(1-\alpha\frac{\lambda}{m}) - \alpha \frac{1}{m}\sum_{i=1}^{m}\left(f_{\mathbf{w}, b}\left(\mathbf{x}^{(i)}\right)-y^{(i)}\right)x_{j}^{(i)}\\
+        b &:= b - \alpha \frac{1}{m}\sum_{i=1}^{m}\left(f_{\mathbf{w}, b}\left(\mathbf{x}^{(i)}\right) - y^{(i)}\right)
+    \end{align}
+    \tcblower
+    \textbf{understanding}: \quad the term $w_j(1-\alpha\frac{\lambda}{m})$ will decrease the size of the parameter $w_j$ each iteration.
+    because we don't want to decrease the bias term $b$, the update of $b$ remains the same.
+\end{thmbox}
+
+\subsection{regularization for logistic classification}
+\subsubsection*{cost function}
+\begin{thmbox}{regularization cost function}{cf}
+    we can modify the cost function as follows:
+    \begin{equation}
+        J(\mathbf{w}, b) = -\frac{1}{m}\sum_{i=1}^{m}\left[y^{(i)}\log(f_{\mathbf{w}, b}\left(\mathbf{x}^{(i)}\right)) + (1-y^{(i)})\log(1-f_{\mathbf{w}, b}\left(\mathbf{x}^{(i)}\right))\right] + \frac{\lambda}{2m}\sum_{j=1}^{n}w_j^2
+    \end{equation}
+\end{thmbox}
+\subsubsection*{gradient descent}
+\begin{thmbox}{regularization gradient descent}{gd}
+    \begin{align}
+        w_j &:= w_j(1-\alpha\frac{\lambda}{m}) - \alpha \frac{1}{m}\sum_{i=1}^{m}\left(f_{\mathbf{w}, b}\left(\mathbf{x}^{(i)}\right)-y^{(i)}\right)x_{j}^{(i)}\\
+        b &:= b - \alpha \frac{1}{m}\sum_{i=1}^{m}\left(f_{\mathbf{w}, b}\left(\mathbf{x}^{(i)}\right) - y^{(i)}\right)
+    \end{align}
+    \tcblower
+    \textbf{understanding}: \quad The formula is the same as the one for linear regression.
+    But the cost function $f_{\mathbf{w}, b}(x)$ is different.
+\end{thmbox}

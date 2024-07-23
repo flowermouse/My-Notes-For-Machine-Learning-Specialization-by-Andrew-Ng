@@ -1,0 +1,114 @@
+\chapter{Mutiple Features}
+\section{Notation}
+\begin{exbox}{Notation for mutiple features}{notation}
+    \begin{align*}
+        n &= \text{number of features} \\
+        x^{(i)} &= \text{input (features) of the $i^{th}$ training example} \\
+        x_j^{(i)} &= \text{value of feature $j$ in the $i^{th}$ training example} \\
+        m &= \text{number of training examples} \\
+        \vec{x} &= \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_n \end{bmatrix} \\
+        \vec{x}^{(i)} &= \begin{bmatrix} x_1^{(i)} \\ x_2^{(i)} \\ \vdots \\ x_n^{(i)} \end{bmatrix}
+    \end{align*}
+\end{exbox}
+
+\section{Hypothesis Function}
+\begin{dfnbox}{Hypothesis Function}{h}
+\paragraph*{Mutiple linear regression}
+\begin{equation}
+    f_{\vec{w}, b} = \vec{w} \cdot \vec{x} + b =\vec{w}^T \vec{x} + b
+\end{equation}
+\tcblower
+\begin{align*}
+    \vec{w} = \begin{bmatrix} w_1 \\ w_2 \\ \vdots \\ w_n \end{bmatrix} \ \ \
+    \vec{x} = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_n \end{bmatrix}
+\end{align*}
+\begin{notebox}
+    the $\vec{w}$ and $\vec{x}$ are both column vectors, %
+    but $b$ is a number.
+\end{notebox}
+\end{dfnbox}
+
+\section{Vectorization}
+The vectorized implementation is much more efficient than the for-loop implementation.
+\paragraph*{For-loop implementation}
+for a sigle training example:
+\begin{minted}{python}
+    # n is the number of features
+    for i in range(n):
+        f += w[i] * x[i]
+    f += b
+\end{minted}
+\paragraph*{Vectorized implementation}
+for a sigle training example:
+\begin{minted}{python}
+    f = np.dot(w, x) + b
+    f = w @ x + b
+    # f = w * x + b  this is wrong, numpy will broadcast
+\end{minted}
+\begin{notebox}
+    np.dot can be used to calculate the dot product of two arrays if they are 1-D arrays.\par
+    and np.dot can also be used to calculate the matrix multiplication if they are 2-D arrays.
+\end{notebox}
+
+\section{Gradient Descent for Multiple Features}
+\begin{dfnbox}{Cost Function for Multiple Features}{gd}
+    The equation for the cost function with multiple variables $J(\mathbf{w},b)$ is:
+    \begin{equation}
+        J(\mathbf{w},b) = \frac{1}{2m} \sum\limits_{i = 0}^{m-1} (f_{\mathbf{w},b}(\mathbf{x}^{(i)}) - y^{(i)})^2
+    \end{equation}
+    where:
+    \begin{equation}
+    f_{\mathbf{w},b}(\mathbf{x}^{(i)}) = \mathbf{w} \cdot \mathbf{x}^{(i)} + b
+    \end{equation}
+    
+    In contrast to previous labs, $\mathbf{w}$ and $\mathbf{x}^{(i)}$ are vectors rather than scalars supporting multiple features.
+\end{dfnbox}
+
+\vspace{1em}
+\begin{thmbox}{Gradient Descent for Multiple Features}{gd}
+Gradient descent for multiple variables:
+
+reapeat until convergence:
+\begin{align}
+    w_j &:= w_j - \alpha \frac{\partial J(\mathbf{w},b)}{\partial w_j} \ \ \ \ \ \ \ \ \ for\ j = 0, \cdots , n-1 \\
+    b &:= b - \alpha \frac{\partial J(\mathbf{w},b)}{\partial b}
+\end{align}
+where, n is the number of features, parameters $w_j$,  $b$, are updated simultaneously and where  
+
+
+\begin{align}
+\frac{\partial J(\mathbf{w},b)}{\partial w_j}  &= \frac{1}{m} \sum\limits_{i = 0}^{m-1} (f_{\mathbf{w},b}(\mathbf{x}^{(i)}) - y^{(i)})x_{j}^{(i)} \tag{6}  \\
+\frac{\partial J(\mathbf{w},b)}{\partial b}  &= \frac{1}{m} \sum\limits_{i = 0}^{m-1} (f_{\mathbf{w},b}(\mathbf{x}^{(i)}) - y^{(i)}) \tag{7}
+\end{align}
+
+\begin{notebox}
+    \begin{itemize}
+        \item m is the number of training examples in the data set
+        \item $f_{\mathbf{w},b}(\mathbf{x}^{(i)})$ is the model's prediction, while $y^{(i)}$ is the target value
+    \end{itemize}
+\end{notebox}
+\end{thmbox}
+
+\subsection{An alternative to the Gradient Descent}
+\paragraph*{Normal equation}
+\begin{itemize}
+    \item Only for linear regression
+    \item Solve for $w$, $b$ without iterations
+\end{itemize}
+
+\paragraph*{Disadvantages}
+\begin{itemize}
+    \item Doesn't generalize to other learning algorithms
+    \item Slow when number of features is large ($>10,000$)
+\end{itemize}
+
+\begin{notebox}
+    \begin{itemize}
+        \item Normal equation method may  be used in machine learning  libraries that implement linear  regression.
+        \item Gradient descent is the  recommended method for  finding parameters \( w,b \)
+    \end{itemize}
+\end{notebox}
+
+\subsection{implementation from scratch} 
+\textbf{file name: multi-lin-regression.py}
+\amzinputcode{python}{codes/multi-lin-regression.py}

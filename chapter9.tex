@@ -1,0 +1,349 @@
+\chapter{Neural Networks Training}
+\section{Training}
+\textbf{Train a neural network in TensorFlow.}
+\begin{minted}{python}
+    import tensorflow as tf
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.layers import Dense
+    model = Sequential([
+        Dense(units=25, activation='sigmoid'),
+        Dense(units=15, activation='sigmoid'),
+        Dense(units=1, activation='sigmoid')
+    ])
+    from tensorflow.keras.loss import BinaryCrossentropy
+    model.compile(loss=BinaryCrossentropy())
+    model.fit(X, Y, epochs=100)
+\end{minted}
+
+\section{Details}
+\textbf{Model Training Details}
+\begin{enumerate}
+    \item specify how to compute the output given input x and parameters w, b (define model)
+    \[f_{\mathbf{w}, b}(\mathbf{x})=?\]
+    \item specify how to compute the loss given the output and the target
+    \[L(f_{\mathbf{w}, b}(\mathbf{x}), y) = ?\]
+    \[J(\mathbf{w}, b) = \frac{1}{m}\sum_{i=1}^{m}L(f_{\mathbf{w}, b}(\mathbf{x^{(i)}}), y^{(i)})\]
+    \item how to update the parameters to minimize the loss
+\end{enumerate}
+\vspace{2em}
+\begin{notebox}
+\begin{minipage}{0.45\textwidth}
+    \begin{center}
+    \textbf{logistic regression}
+    \end{center}
+    \begin{enumerate}
+        \item \texttt{z = np.dot(x, w) + b}
+        \item[] \texttt{f\_x = 1 / (1 + np.exp(-z))}
+        \item \textbf{Logistic Loss}
+        \item[] \texttt{loss = -y * np.log(f\_x) - (1 - y) * np.log(1 - f\_x)}
+        \item \texttt{w = w - alpha * dw}
+        \item[] \texttt{b = b - alpha * db}
+    \end{enumerate}
+\end{minipage}
+\vrule{}
+\begin{minipage}{0.45\textwidth}
+    \begin{center}
+    \textbf{neural network}
+    \end{center}
+    \begin{enumerate}
+        \item \texttt{model = Sequential([...])}
+        \item[] 
+        \item \textbf{Binary Cross Entropy}
+        \item[] \texttt{model.compile(loss=BinaryCrossentropy())}
+        \item[] 
+        \item \texttt{model.fit(X, Y, epochs=100)}
+        \item[]
+    \end{enumerate}
+\end{minipage}
+\end{notebox}
+
+\subsection*{Create the model}
+\begin{minted}{python}
+    import tensorflow as tf
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.layers import Dense
+
+    model = Sequential([
+        Dense(units=25, activation='sigmoid'),
+        Dense(units=15, activation='sigmoid'),
+        Dense(units=1, activation='sigmoid')
+    ])
+\end{minted}
+
+\subsection*{Loss and cost function}
+logistic loss also known as binary cross entropy:
+\[ L(f_{\mathbf{w}, b}(\mathbf{x}), y) = -y \log(f_{\mathbf{w}, b}(\mathbf{x})) - (1 - y) \log(1 - f_{\mathbf{w}, b}(\mathbf{x})) \]
+\begin{minted}{python}
+    from tensorflow.keras.loss import BinaryCrossentropy
+    model.compile(loss=BinaryCrossentropy())
+\end{minted}
+If you are predicting numbers and not classes, you can use mean squared error:
+\begin{minted}{python}
+    from tensorflow.keras.loss import MeanSquaredError
+    model.compile(loss=MeanSquaredError())
+\end{minted}
+
+\subsection*{Gradient descent}
+The tensorflow model will automatically compute the
+ gradients and update the weights and biases using \textbf{backpropagation}\par
+\begin{minted}{python}
+    model.fit(X, Y, epochs=100)
+\end{minted}
+
+\section{Activation functions}
+\begin{dfnbox}{Linear Activation}{la}
+    \dfntxt{Linear activation} is the simplest activation function. 
+    It is also called ``no activation function''.
+    \begin{equation}
+        g(z) = z
+    \end{equation}
+\end{dfnbox}
+
+\begin{dfnbox}{Sigmoid Activation}{sa}
+    \dfntxt{Sigmoid activation} squashes the output to be between 0 and 1.
+    \begin{equation}
+        g(z) = \frac{1}{1 + e^{-z}}
+    \end{equation}
+\end{dfnbox}
+
+\begin{dfnbox}{ReLU Activation}{ra}
+    \dfntxt{Relu activation} (Rectified Linear Unit) is the most popular activation function.
+    \begin{equation}
+        g(z) = \max(0, z)
+    \end{equation}
+\end{dfnbox}
+
+\subsection*{Choosing activation functions}
+\subsubsection*{Output layer}
+If the output should be between 0 and 1, use sigmoid activation. If the output can be negative, use linear activation.
+If the output is non-negative, use ReLU activation. And if the output is a multi-class classification, use softmax activation. 
+\begin{itemize}
+    \item For binary classification, use sigmoid activation.
+    \item For multi-class classification, use softmax activation.
+    \item For regression, use linear activation.    
+\end{itemize}
+\subsubsection*{Hidden layers}
+ReLU activation is the most popular activation function for hidden layers.\par
+Sigmoid function has two ``flat'' zones, which can slow down learning.
+And compared to ReLU, sigmoid are more computationally expensive.\par
+So, usually we use ReLU for hidden layers.
+
+\vspace{2em}
+\begin{notebox}
+    \hspace{2em}If use all the layers with Linear activation, 
+    the whole network will be equivalent to a single layer with linear activation, which is same as linear regression.
+    \par
+    \hspace{2em}If use all the hidden layers with Linear activation, and the output layer with sigmoid activation,
+    the whole network will be equivalent to a single layer with sigmoid activation, which is same as logistic regression.
+\end{notebox}
+
+\section{Multiclass Classification}
+\subsection*{Softmax regression}
+\noindent
+\textbf{Logistic regression} (2 possible outcomes)
+\begin{align*}
+    &a_1 = P(y=1|x) = \frac{1}{1 + e^{-(w^Tx + b)}}\\
+    &a_2 = P(y=0|x) = 1 - a_1
+\end{align*}
+\textbf{Softmax regression} (N possible outcomes)
+\begin{align*}
+    z_j &= w_j^Tx + b_j\\
+    a_j &= \frac{e^{z_j}}{\sum_{k=1}^{N}e^{z_k}}
+\end{align*}
+note: $a_1 + a_2 + \cdots + a_N = 1$
+
+\subsubsection*{Cost}
+\noindent
+\textbf{Logistic regression}
+\begin{align*}
+    L(a, y) &= \begin{cases} -\log(a_1) & \text{if } y = 1\\ 
+        -\log(a_2) & \text{if } y = 0 \end{cases}=  -y \log(a_1) - (1 - y) \log(1 - a_1)\\
+    J(w, b) &= \frac{1}{m}\sum_{i=1}^{m}L(a^{(i)}, y^{(i)})
+\end{align*}
+\textbf{Softmax regression}
+\begin{align*}
+    a_1 = P(y=1|x) &= \frac{e^{z_1}}{e^{z_1} + e^{z_2} + \cdots + e^{z_N}}\\
+    a_2 = P(y=2|x) &= \frac{e^{z_2}}{e^{z_1} + e^{z_2} + \cdots + e^{z_N}}\\
+    &\vdots\\
+    a_N = P(y=N|x) &= \frac{e^{z_N}}{e^{z_1} + e^{z_2} + \cdots + e^{z_N}}\\
+\end{align*}
+\textbf{Cross entropy loss}
+\begin{align*}
+    \mathrm{loss} &= 
+    \begin{cases}
+        -\log(a_1) & \text{if } y = 1\\
+        -\log(a_2) & \text{if } y = 2\\
+        &\vdots \\
+        -\log(a_N) & \text{if } y = N
+    \end{cases}
+    = -\log(a_j) \quad \text{ if } y = j
+\end{align*}
+
+\vspace{2em}
+\begin{minted}{python}
+    from tensorflow.keras.loss import CategoricalCrossentropy
+    model.compile(loss=CategoricalCrossentropy())
+\end{minted}
+
+\subsubsection*{Template}
+\begin{minted}{python}
+    import tensorflow as tf
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.layers import Dense
+    from tensorflow.keras.loss import SparseCategoricalCrossentropy
+
+    model = Sequential([
+        Dense(units=25, activation='relu'),
+        Dense(units=15, activation='relu'),
+        Dense(units=10, activation='softmax')
+    ])
+    model.compile(loss=SparseCategoricalCrossentropy())
+    model.fit(X, Y, epochs=100)
+\end{minted}
+This verison is not recommended, because it is not efficient.\par
+Here is a improved version:
+\begin{minted}{python}
+    import tensorflow as tf
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.layers import Dense
+    from tensorflow.keras.loss import SparseCategoricalCrossentropy
+
+    model = Sequential([
+        Dense(units=25, activation='relu'),
+        Dense(units=15, activation='relu'),
+        Dense(units=10, activation='linear')
+    ])
+    model.compile(..., loss=SparseCategoricalCrossentropy(from_logits=True))
+    model.fit(X, Y, epochs=100)
+\end{minted}
+\par
+Predication:
+\begin{minted}{python}
+    logits = model.predict(new_data)
+    probabilities = tf.nn.softmax(logits)
+\end{minted}
+\subsubsection*{Explaination}
+\textbf{Numerical Roundoff Error}\\
+    Because the computation of softmax involves exponentiation, it can be numerically unstable.
+    There exists a way of TensorFlow to compute the softmax and the cross-entropy loss in a single step, which is more numerically stable.
+\begin{notebox}
+    \begin{itemize}
+        \item Change the output layer activation to \textbf{linear}.
+        \item Add \colorbox{mycolor}{\texttt{from\_logits=True}} to the loss function.
+        \item Because the result haven't been processed with Softmax, Use \colorbox{mycolor}{\texttt{tf.nn.softmax}} to compute the probabilities.
+    \end{itemize}
+    \hspace{2em}\texttt{from\_logits=True} means that the output of the model is not probabilities, but logits.
+    By applying \texttt{from\_logits=True}, the loss function will automatically apply softmax to the output of the model before computing the loss.
+    The reason for chaning the output layer activation to linear is and applying from\_logits=True is that TensorFlow can optimize the computation of the softmax 
+    and the cross-entropy loss, which is more numerically stable.
+\end{notebox}
+\par
+The same can be done for logistic regression, by changing the output layer activation to linear and using \texttt{BinaryCrossentropy(from\_logits=True)}.
+\begin{minted}{python}
+    model = Sequential([
+        Dense(units=25, activation='relu'),
+        Dense(units=15, activation='relu'),
+        Dense(units=1, activation='linear')
+    ])
+    model.compile(..., loss=BinaryCrossentropy(from_logits=True))
+    model.fit(X, Y, epochs=100)
+
+    logits = model.predict(new_data)
+    probabilities = tf.nn.sigmoid(logits)
+\end{minted}
+
+
+\section{Multi-label Classification}
+Multilable classification is a generalization of multiclass classification, where each instance can be assigned multiple labels.
+\subsection*{differences between multiclass and multilabel classification}
+\begin{itemize}
+    \item In multiclass classification, each instance is assigned to one and only one class.
+    \item In multilabel classification, each instance can be assigned to multiple classes.
+\end{itemize}
+\par
+\includegraphics*[width=0.9\textwidth]{images/9.1}\par
+In this example, each image can be assigned to multiple labels.
+For example, an image can be assigned to both ``include car'', ``include bus'', and ``include pedestrian''.
+We can build 3 separate binary classifiers, one for each label.
+Also, we can build a single neural network with 3 output units, one for each label. (multi-label classification)
+Usually, we use the sigmoid activation function for the output layer in multi-label classification 
+while we use the softmax activation function in multi-class classification.
+\begin{notebox}
+    The output of multiclass classification is a probability distribution over the classes, so its sum must be 1.
+    But the output of multilabel classification is not a probability distribution, so its sum is not 1.
+\end{notebox}
+
+\section{Adam Optimizer}
+\textbf{Adam} is an optimization algorithm that can be used instead of the classical 
+gradient descent procedure to update network weights iteratively based on training data.\par
+\includegraphics*[width=\textwidth]{images/9.2}\par
+By changing the learning rate, we can achieve better performance.\par
+\begin{minted}{python}
+    model = Sequential([
+        Dense(units=25, activation='relu'),
+        Dense(units=15, activation='relu'),
+        Dense(units=1, activation='linear')
+    ])
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+     loss=BinaryCrossentropy(from_logits=True))
+    model.fit(X, Y, epochs=100)
+\end{minted}
+
+\section{Additional layer types}
+\textbf{Dense layer}: Each neuron output is a function of all the inputs.\par
+\textbf{Convolutional layer}: Each neuron output is a function of a subset of the inputs.
+Why? 1. Faster computation. 2. Need less training data (less prone to overfitting).\par
+\includegraphics*[width=\textwidth]{images/9.3}
+
+\section{Computation graph}
+\textbf{Computation graph} is a way to represent the computation of a neural network.
+We use forward propagation to compute the output of the neural network and use backpropagation to compute the gradients of the loss function with respect to the parameters of the neural network.
+The essence of backpropagation is \textbf{``Chain Rule''} in calculus.\par
+\includegraphics*[width=\textwidth]{images/9.4}
+\includegraphics*[width=\textwidth]{images/9.5}
+\par
+
+When computing derivatives for a two-layer neural network using backpropagation, the process proceeds as follows:
+
+\textbf{Forward Propagation:}
+\begin{itemize}
+   \item Input to hidden layer computation: \( h = f(W_1 x + b_1) \), where \( W_1 \) is the weight matrix for the hidden layer and \( b_1 \) is the bias vector.
+   \item Hidden to output layer computation: \( y = g(W_2 h + b_2) \), where \( W_2 \) is the weight matrix for the output layer and \( b_2 \) is the bias vector.
+   \item Loss computation: \( L = L(y, y_{\text{true}}) \), where \( y_{\text{true}} \) is the true target output.
+\end{itemize}
+
+\textbf{Backward Propagation:}
+The goal of backpropagation is to compute the derivatives of the loss function \( L \) with respect to all parameters, i.e., \( \frac{\partial L}{\partial W_1}, \frac{\partial L}{\partial b_1}, \frac{\partial L}{\partial W_2}, \frac{\partial L}{\partial b_2} \).
+
+\begin{itemize}
+   \item \textbf{Compute derivatives at the output layer:}
+   \[
+   \frac{\partial L}{\partial W_2} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial W_2}
+   \]
+   \[
+   \frac{\partial L}{\partial b_2} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial b_2}
+   \]
+
+   \item \textbf{Compute derivatives at the hidden layer:}
+   \[
+   \frac{\partial L}{\partial h} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial h}
+   \]
+   \[
+   \frac{\partial L}{\partial W_1} = \frac{\partial L}{\partial h} \cdot \frac{\partial h}{\partial W_1}
+   \]
+   \[
+   \frac{\partial L}{\partial b_1} = \frac{\partial L}{\partial h} \cdot \frac{\partial h}{\partial b_1}
+   \]
+\end{itemize}
+
+Here, derivatives are computed layer by layer, starting from the output layer and propagating backwards to the hidden layer. The chain rule is applied to propagate errors back through the network.
+\par
+\vspace{2em}
+Back propagation is an efficient way to compute the gradients of the loss function with respect to the parameters of the neural network.
+When there is $N$ nodes and $P$ parameters in the network, the back propagation algorithm only need to compute $O(N + P)$ operations instead of $O(NP)$ operations.
+The $N$ steps are used to compute the gradients of the loss function with respect to the output of each node ($\frac{\partial J}{\partial \mathbf{a}^{[i]}}$),
+ and the $P$ steps are used to compute the gradients of the loss function with respect to each parameter ($\frac{\partial J}{\partial w} $ or $\frac{\partial J}{\partial b}$).
+\par
+\noindent
+\includegraphics*[width=\textwidth]{images/9.6}
+\includegraphics*[width=\textwidth]{images/9.7}

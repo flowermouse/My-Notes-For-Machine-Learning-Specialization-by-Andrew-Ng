@@ -1,0 +1,144 @@
+\chapter{Anomaly Detection}
+\section{Find unusual events}
+\begin{dfnbox}{Anomaly detection}{ad}
+\textbf{Anomaly detection} is the task of finding unusual events in the data.
+\end{dfnbox}
+\includegraphics*[width=\textwidth]{images/a1}
+\vspace{1em}
+\includegraphics*[width=\textwidth]{images/a3}\par
+We will model the probability of the data, and flag data points with low probability as anomalies.
+we can set a threshold $\varepsilon$ to determine which data points are anomalies.
+If $p(x) < \varepsilon$, then $x$ is an anomaly.\\
+\includegraphics*[width=\textwidth]{images/a2}
+
+\section{Algorithm}
+\subsection*{Gaussian Distribution}
+Contents about Gaussian distribution can be found in the Stanford CS109 course, so I will not repeat details here.
+But remeber that the PDF (Probability Density Function) of the Gaussian distribution is:
+\begin{equation}
+    p(x;\mu,\sigma^2) = \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\dfrac{(x-\mu)^2}{2\sigma^2}\right)
+\end{equation}
+where $\mu$ is the mean and $\sigma^2$ is the variance of the Gaussian distribution.
+Because the shape of the Gaussian distribution is like a bell, it is also called the normal distribution.\par
+The parameters $\mu$ and $\sigma^2$ can be estimated from the data.
+So what we are going to do is compute the mean and variance of each feature in the training set.
+Below is the formal Anomaly Detection Algorithm:
+\begin{thmbox}{Anomaly Detection Algorithm}{ada}
+    \begin{enumerate}
+        \item Choose $n$ features $x_i$ that you think might be indicative of anomalous examples.
+        \item fit parameters $\mu_1,\cdots,\mu_n,\sigma_1^2,\cdots,\sigma_n^2$:
+        \begin{align}
+            \mu_j &= \frac{1}{m} \sum\limits_{i=1}^{m} x_j^{(i)} \\
+            \sigma_j^2 &= \frac{1}{m} \sum\limits_{i=1}^{m} (x_j^{(i)} - \mu_j)^2
+        \end{align}
+        \item Given a new example $\mathbf{x}$, compute $p(\mathbf{x})$:
+        \item[] \begin{equation}
+            p(\mathbf{x}) = \prod\limits_{j=1}^{n} p(x_j;\mu_j,\sigma_j^2) 
+            = \prod\limits_{j=1}^{n} \frac{1}{\sqrt{2\pi}\sigma_j} \exp\left(-\frac{(x_j-\mu_j)^2}{2\sigma_j^2}\right)
+        \end{equation}
+        \item Anomaly if $p(\mathbf{x}) < \varepsilon$.
+    \end{enumerate}
+    \begin{notebox}
+        \begin{enumerate}
+            \item In some statistics books, you may see it devide by $m - 1$, 
+            but in machine learning, we usually devide by $m$. (This can be derived from the maximum likelihood estimation.)
+            \item the probability of the data point occurring can be calculated by multiplying the probabilities of each feature.
+            So $p(\mathbf{x})= \prod\limits_{j=1}^{n} p(x_j;\mu_j,\sigma_j^2)$.
+        \end{enumerate}
+    \end{notebox}
+\end{thmbox}
+
+\includegraphics*[width=\textwidth]{images/a4}
+
+\section{Developing and Evaluating an Anomaly Detection System}
+\subsection*{Evaluating algorithm}
+Assume that we have a labeled dataset, 
+where the normal examples are labeled as $y=0$ and the anomalous examples are labeled as $y=1.$
+\par
+We can devide the dataset into 3 parts: training set, cross validation set, and test set.
+The training set is used to fit the parameters, the cross validation set is used to choose the threshold $\varepsilon$,
+and the test set is used to evaluate the algorithm.
+And the training examples should all be normal examples, which means $y=0$ (while it's okay if a few 
+anomalous examples occur). The cross validation and test sets should have a small part of anomalous examples.
+\par
+If in our datasets, there is a really small number of anomalous examples, it is
+recommended to drop the test set, and use all the anomalous examples in the cross validation set for choosing the threshold $\varepsilon$.
+While this method may lead to higher risk of overfitting, it is still a good way to evaluate the algorithm.
+\par
+\begin{thmbox}{Evaluation}{e}
+    \begin{enumerate}
+        \item Fit model $p(x)$ on training set $\{x^{(1)},\cdots,x^{(m)}\}$.
+        \item On a cross validation/test example $x$, predict:
+        \begin{equation}
+            y = \begin{cases}
+                1 & \text{if } p(x) < \varepsilon \ \text{(anomaly)}\\
+                0 & \text{if } p(x) \geq \varepsilon \ \text{(normal)}
+            \end{cases}
+        \end{equation}
+        \item Possible evaluation metrics:
+        \begin{itemize}
+            \item True positive, false positive, false negative, true negative.
+            \item Precision/Recall.
+            \item $F_1$ score.
+        \end{itemize}
+        \item Use cross validation set to choose parameter $\varepsilon$.
+    \end{enumerate}
+    \begin{notebox}
+        The ``skewed datasets'' method introduced in part 2 is commonly used in anomaly detection.
+    \end{notebox}
+\end{thmbox}
+
+\section{Anomaly Detection vs. Supervised Learning}
+\textbf{Responding features: }
+
+\noindent
+\begin{minipage}{0.49\textwidth}
+    \begin{itemize}
+        \item Very small number of positive examples $(y=1)$, Large number of negative examples $(y=0)$.
+        \item Many different "types" of anomalies. 
+        Hard for any algorithm to learn from positive examples what the anomalies look like;
+        future anomalies may look nothing like any of the anomalous examples we've seen so far.
+    \end{itemize}
+\end{minipage}
+\vline
+\begin{minipage}{0.49\textwidth}
+    \begin{itemize}
+        \item Large number of positive and  negative examples.
+        \item Enough positive examples for algorithm to get a sense of what positive examples are like, future positive examples likely to be similar to ones in training set.
+    \end{itemize}
+\end{minipage}
+
+\vspace{3em}
+
+\textbf{Examples:}
+
+\noindent
+\begin{minipage}{0.49\textwidth}
+    \begin{itemize}
+        \item Fraud detection
+        \item Manufacturing - Finding new previously unseen defects in manufacturing.(e.g. aircraft engines)
+        \item Monitoring machines in a data center
+    \end{itemize}
+\end{minipage}
+\vline
+\begin{minipage}{0.49\textwidth}
+    \begin{itemize}
+        \item Email spam classification
+        \item Weather prediction(eg. rainy/sunny)
+        \item Manufacturing - Finding known, previously seen defects
+        \item Diseases classification
+    \end{itemize}
+\end{minipage}
+
+\section{Choosing What Features to Use}
+\subsection*{Non-Gaussian Features}
+If the features are not Gaussian distributed, we can 
+try transforming the features to make them more Gaussian distributed.
+We want to make the features more Gaussian-like, so we can use the Gaussian model to detect anomalies.\\
+\includegraphics*[width=\textwidth]{images/a5}
+
+We want $p(x)$ to be large for normal examples and small for anomalies.\\
+\includegraphics*[width=\textwidth]{images/a6}
+
+We can combine the features to create new features.\\
+\includegraphics*[width=\textwidth]{images/a7}
