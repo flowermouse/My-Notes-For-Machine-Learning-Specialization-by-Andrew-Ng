@@ -1,0 +1,105 @@
+\documentclass[math,code]{amznotes}
+
+\usepackage{lipsum}     % filler text
+
+\begin{document}
+    \tableofcontents
+
+    \chapter{Overview}
+
+    \section{Sample}
+
+    \begin{dfnbox}{amznotes}{amznotes}
+        \dfntxt{amznotes} is a \LaTeX\ package that makes it easy to write pretty notes.
+    \end{dfnbox}
+
+    \begin{thmbox}{Cool Theorem}{cool}
+        This \LaTeX\ template is cool.
+        \tcblower
+        \begin{proof}
+            Here is what some math looks like:
+            \[ \forall (n \in \N) \left[ \sum_{i=1}^n i = \frac{n(n+1)}{2} \right] \]
+            \[ \laplace \{ f \} (s) = \int_{0}^{\infty} e^{-st} f(t)\ dt \]
+            Some more math:
+            \begin{align*}
+                \floor{x} &= \max \{ n \in \Z : n \leq x \} \\
+                \ceil{x} &= \min \{ n \in \Z : n \geq x \}
+            \end{align*}
+            The math is good.
+        \end{proof}
+    \end{thmbox}
+
+    As seen in \nameref{thm:cool} (Theorem \ref{thm:cool}), this template is pretty cool.
+
+    \section{Installation}
+    To install this package, download the \href{https://raw.githubusercontent.com/alexmingzhang/latex-notes-template/main/amznotes.cls}{amznotes.cls} file and follow \href{https://tex.stackexchange.com/questions/1137/where-do-i-place-my-own-sty-or-cls-files-to-make-them-available-to-all-my-te}{this guide}\footnote{https://tex.stackexchange.com/questions/1137/where-do-i-place-my-own-sty-or-cls-files-to-make-them-available-to-all-my-te}. Alternatively, you can simply add the amznotes.cls file to the same directory as the \texttt{.tex} file you want to use it with.
+
+    \section{Usage}
+    Once installed, you can use the amznotes document class with \texttt{\textbackslash documentclass\textbraceleft amznotes\textbraceright}.
+
+    \begin{codebox}{Using amznotes}{cool}
+        \begin{amzcode}{latex}
+            \documentclass[math,code]{amznotes}
+        \end{amzcode}
+    \end{codebox}
+
+    The \texttt{math} option enables \texttt{thmbox} and various math macros. The \texttt{code} option enables \texttt{codebox} and code environments.
+
+    Using the boxes is pretty straight-forward. They're based on the \texttt{tcbtheorem} from \texttt{tcolorbox}. We can see how to use one below:
+    \begin{codebox}{Using boxes}{boxes}
+        \begin{amzcode}{latex}
+            \begin{exbox}{Cool Example}{coolexample}
+                This is my example!
+            \end{exbox}
+            \nameref{ex:coolexample} (example \ref{ex:coolexample}) is pretty cool.
+        \end{amzcode}
+    \end{codebox}
+
+    This is what Code Snippet \ref{code:boxes} produces:
+
+    \begin{notebox}
+        \begin{exbox}{Cool Example}{coolexample}
+            This is my example!
+        \end{exbox}
+        \nameref{ex:coolexample} (example \ref{ex:coolexample}) is pretty cool.
+    \end{notebox}
+
+    amznotes provides many predefined color boxes. The ones that are numbered include:
+    \begin{itemize}[noitemsep]
+        \item \texttt{dfnbox} -- definition box
+        \item \texttt{exbox} -- example box
+        \item \texttt{tecbox} -- technique box
+        \item \texttt{thmbox} -- theorem box (with option \texttt{math})
+        \item \texttt{codebox} -- code box (with option \texttt{code})
+    \end{itemize}
+
+    Some unnumbered/unindexed boxes include:
+    \begin{itemize}[noitemsep]
+        \item \texttt{genbox} -- general info box
+        \item \texttt{notebox}
+    \end{itemize}
+
+    You can also easily create your own boxes with the amznotes style using the \texttt{\textbackslash newamzbox} command in the preamble. These will be numbered and indexed like the other boxes.
+
+    \begin{codebox}{Using \texttt{\textbackslash newamzbox}}{}
+        \begin{amzcode}{latex}
+            \newamzbox{environment name}{title}{ref label}{color}[tcolorbox style]
+        \end{amzcode}
+    \end{codebox}
+
+    \chapter{Really really long chapter title that has to use more than one line because it is so long}
+    \lipsum[100]
+    \lipsum[101]
+
+    \lipsum[102]
+
+    \begin{notebox}
+        \lipsum[21]
+    \end{notebox}
+
+    \lipsum[104]
+
+
+    \amzindex
+
+\end{document}

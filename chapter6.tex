@@ -20,11 +20,18 @@ In the case of binary classification, the output is a binary value, 0 or 1.\\
     We can use linear regression to predict the output.
     The output of linear regression can be any real number, which can be greater than 1 or less than 0.
     We can set a threshold value, say 0.5. If the output is greater than 0.5, we can classify it as 1, and if it is less than 0.5, we can classify it as 0.\par
-    \hspace{2em}Take the example of predicting a tumor as malignant or benign.\par
-    \includegraphics*[width=\textwidth]{images/5.1_1.png}\par
+    \hspace{2em}Take the example of predicting a tumor as malignant or benign.
+
+    \begin{minipage}{0.5\textwidth}
+        \includegraphics[width=\textwidth]{images/6.1.1.png}
+    \end{minipage}
+    \begin{minipage}{0.5\textwidth}
+        \includegraphics[width=\textwidth]{images/6.1.2.png}
+    \end{minipage}
+
     \hspace{2em}In the above figure, if we add more malignant tumors with a large size, the line will shift towards the malignant side.
-    This will cause the benign tumors to be classified as malignant.
-    However, the benign tumors are still benign, but they are classified as malignant because of the shift in the line.
+    This will cause the malignant tumors to be classified as benign.
+    However, the malignant tumors are still malignant, but they are classified as benign because of the shift in the line.
 \end{exbox}
 
 
@@ -41,7 +48,7 @@ In the case of binary classification, the output is a binary value, 0 or 1.\\
 \end{dfnbox}
 
 \begin{thmbox}{Logistic Regression}{lr}
-    \hspace{2em}we can transform the output of linear regression using the sigmoid function.
+    We can transform the output of linear regression using the sigmoid function.
     \begin{align*}
         f_{(\mathbf{w}, b)}(\mathbf{x}) &= g(z) \\
         z &= \mathbf{w}^T \mathbf{x} + b \\
@@ -58,12 +65,20 @@ the given input point belongs to the positive class.(class 1)\\
     f_{(\mathbf{w}, b)}(\mathbf{x}) = P(y = 1 | \mathbf{x}; \mathbf{w}, b)
 \end{equation}
 
-\subsection{Decision Boundary}
+\begin{notebox}
+    \hspace{2em}By using the sigmoid function, the output of logistic regression is always between 0 and 1.
+    And it provide a nonlinear fit curve, which solves the problem of linear regression in the previous tumor example.
+    
+    \centering
+    \includegraphics*[width=0.8\textwidth]{images/6.1.3}
+\end{notebox}
+
+\section{Decision Boundary}
 \paragraph*{How to classify?}
 when the output of logistic regression is greater than 0.5,
-we classify it as 1, and when it is less than 0.5, we classify it as 0.\\
+we classify it as 1, and when it is less than 0.5, we classify it as 0.
 \par
-\hspace{2em}By looking at the sigmoid function,
+By looking at the sigmoid function,
  we can see that the output of logistic regression is greater than 0.5 when $z > 0$ and less than 0.5 when $z < 0$.
 Which is to say when $\mathbf{w}^T \mathbf{x} + b > 0$,
  we classify it as 1, and when $\mathbf{w}^T \mathbf{x} + b < 0$, we classify it as 0.\\
@@ -75,26 +90,21 @@ Which is to say when $\mathbf{w}^T \mathbf{x} + b > 0$,
     and the $z$ can be also other comlex functions. Such as $z = w_1 x_1^2 + w_2 x_2^2 + b$, which is a circle.
 \end{notebox}
 
-\begin{minipage}{0.5\textwidth}
-    \includegraphics[width=\textwidth]{images/6.1_3 (2)}
-\end{minipage}
-\begin{minipage}{0.5\textwidth}
-    \includegraphics[width=\textwidth]{images/6.1_3 (1)}
-\end{minipage}
-\vspace{2em}
 \begin{center}
-\includegraphics[width=0.7\textwidth]{images/6.1_3 (3)}
+    \includegraphics[width=0.7\textwidth]{images/6.1_3 (2)}\\
+    \includegraphics[width=0.7\textwidth]{images/6.1_3 (1)}\\
+    \includegraphics[width=0.7\textwidth]{images/6.1_3 (3)}
 \end{center}
-\newpage
-
+ 
 \section{Cost Function}
-\paragraph*{why it is unreasonable to use the cost function of linear regression?}\leavevmode \par
-\hspace{2em}the squared error cost function of linear regression is not suitable for logistic regression.
+\paragraph*{Why it is unreasonable to use the cost function of linear regression?}\leavevmode
+
+The squared error cost function of linear regression is not suitable for logistic regression.
 because when we use it, the cost function of logistic regression will be non-convex.
 which means it will have many local minimums, and gradient descent may not converge to the global minimum.\par
 
 \begin{dfnbox}{Logistic loss function}{llf}
-    \hspace{2em}The cost function of logistic regression is defined as:\par
+    The cost function of logistic regression is defined as:\par
     \[
     L(f_{\mathbf{w}, b}(\mathbf{x}^{(i)}), y^{(i)})=
     \begin{cases}
@@ -120,7 +130,28 @@ which means it will have many local minimums, and gradient descent may not conve
 \end{dfnbox}
 
 \begin{notebox}
-    the cost function of logistic regression is derived from the principle of maximum likelihood estimation.
+    \hspace*{2em}The cost function of logistic regression is derived from the principle of maximum likelihood estimation 
+    (MLE).
+
+    \hspace*{2em}In this derivation, we will use the Bernoulli distribution to model the probability of the output.
+    \begin{align*}
+        P(Y=1|X= \mathbf{x}) &= f_{\mathbf{w}, b}(\mathbf{x})= \hat{p}\\
+        P(Y=0|X= \mathbf{x}) &= 1 - f_{\mathbf{w}, b}(\mathbf{x}) = 1 - \hat{p}
+    \end{align*}
+    Since this PMF of Bernoulli distribution is inderivable, we create a likelihood function: $p^y(1-p)^{1-y}$.
+    \begin{equation*}
+        P(Y=y|X= \mathbf{x}) = f_{\mathbf{w}, b}(\mathbf{x})^y(1 - f_{\mathbf{w}, b}(\mathbf{x}))^{1-y} =\hat{p}^y(1-\hat{p})^{1-y}
+    \end{equation*}
+    The likelihood function is the product of the probabilities of the observed data points.\\
+    Assume that the data points are independent and identically distributed (i.i.d):
+    \begin{equation*}
+        L(\mathbf{w}, b) = \prod_{i=1}^{m} P(Y=y^{(i)}|X= \mathbf{x}^{(i)}) = \prod_{i=1}^{m} \hat{p}^{y^{(i)}}(1-\hat{p})^{1-y^{(i)}}
+    \end{equation*}
+    Take the log:
+    \begin{equation*}
+        \log L(\mathbf{w}, b) = \sum_{i=1}^{m} y^{(i)} \log \hat{p} + (1 - y^{(i)}) \log(1 - \hat{p})
+    \end{equation*}
+    This is the log likelihood function. We want to maximize this function, so we take the negative of it as the cost function.
 \end{notebox}
 
 \section{Gradient Descent}
@@ -147,10 +178,33 @@ which means it will have many local minimums, and gradient descent may not conve
     \end{align}
 \end{thmbox}
 
-\subsection*{the math derivation is below}
-\newpage
-\begin{center}
-    \includegraphics[height=\textheight]{images/derivation}
-\end{center}
+\subsection*{The math derivation is below}
+key: $\frac{\partial}{\partial z} g(z) = g(z)(1 - g(z))$, $g(z)$ is the sigmoid function.
 
+(actually here $z$ is $z^{(i)}$, but for shorter we write it as $z$)
 
+let:
+\begin{align*}
+    z &= \mathbf{w}^T \mathbf{x}^{(i)} + b = w_1x_1^{(i)} + w_2x_2^{(i)} + \cdots + w_nx_n^{(i)}\\
+    f_{\mathbf{w}, b}(\mathbf{x}) &= g(z) = \frac{1}{1 + e^{-z}} = p\\
+\end{align*}
+\begin{align*}
+    &\frac{\partial}{\partial w_j}J(\mathbf{w}, b)\\
+    &= \frac{\partial}{\partial w_j}-\frac{1}{m} \sum_{i=1}^{m} \left[y^{(i)} \log p + (1 - y^{(i)}) \log(1 - p)\right]\\
+    &= \frac{\partial}{\partial w_j}-\frac{1}{m} \sum_{i=1}^{m} \left[\log (1-p) + y^{(i)}\log \frac{p}{1-p}\right]\\
+    & \ast \ p = \frac{1}{1 + e^{-z}}\\
+    &= \frac{\partial}{\partial w_j}-\frac{1}{m} \sum_{i=1}^{m} \left[\log \frac{1}{e^z + 1} + y^{(i)}\log e^z\right]\\
+    & \ast \ \text{chain rule for $z \rightarrow w_j$:}\\
+    &= -\frac{1}{m} \sum_{i=1}^{m} \left[\frac{\partial \log \frac{1}{e^z + 1}}{\partial z}\frac{\partial z}{\partial w_j} + y^{(i)}\frac{\partial z}{\partial z}\frac{\partial z}{\partial w_j}\right]\\
+    &= -\frac{1}{m} \sum_{i=1}^{m} \left[(e^z + 1)\frac{-e_z}{(e^z + 1)^2}\frac{\partial z}{\partial w_j} + y^{(i)}\frac{\partial z}{\partial w_j}\right]\\
+    &= -\frac{1}{m} \sum_{i=1}^{m} \left[\frac{-1}{1+e^{-z}} + y^{(i)}\right]\frac{\partial z}{\partial w_j}\\
+    & \ast \ \frac{\partial z}{\partial w_j} = x_j^{(i)}\\
+    &= \frac{1}{m} \sum_{i=1}^{m} \left[\frac{1}{1+e^{-z}} - y^{(i)}\right]x_j^{(i)}\\
+    &= \frac{1}{m} \sum_{i=1}^{m} \left[f_{\mathbf{w}, b}(\mathbf{x}^{(i)}) - y^{(i)}\right]x_j^{(i)}
+\end{align*}
+The same goes to $\frac{\partial}{\partial b}J(\mathbf{w}, b)$:
+\begin{align*}
+    &\frac{\partial}{\partial b}J(\mathbf{w}, b)\\
+    &= \frac{1}{m} \sum_{i=1}^{m} \left[\frac{1}{1+e^{-z}} - y^{(i)}\right]\frac{\partial z}{\partial b}\\
+    &= \frac{1}{m} \sum_{i=1}^{m} \left[f_{\mathbf{w}, b}(\mathbf{x}^{(i)}) - y^{(i)}\right]
+\end{align*}

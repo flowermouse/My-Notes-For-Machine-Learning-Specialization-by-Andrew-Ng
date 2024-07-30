@@ -4,7 +4,7 @@ Decision trees are a popular method for various machine learning tasks.
 They are easy to understand and interpret, and the process of building a decision tree is intuitive.
 \par
 \noindent
-{\large \textbf{Cat classification example:}}
+{\large \textbf{Cats classification example:}}
 \\
 \includegraphics[width=\textwidth]{images/11.1}
 \par
@@ -17,7 +17,7 @@ and each \textbf{leaf node} represents the outcome.\\
 The algorithm's goal is to find the decision tree that best classifies the training data.
 The learning process is divided into two steps:\par
 \textbf{Decision 1:} How to choose what features to split on at each node?\\
-maximize purity(minimize impurity) of the child nodes.\\
+maximize purity (minimize impurity) of the child nodes.\\
 \includegraphics[width=\textwidth]{images/11.3}
 \par
 \textbf{Decision 2:} When to stop splitting?\\
@@ -56,7 +56,6 @@ Choosing splits that maximize information gain.\\
 \subsection*{Algorithm}
 \begin{thmbox}{Decision tree algorithm}{d}
 \begin{enumerate}
-    \item 
     \item \texttt{current node = root node}
     \item \texttt{While not stopping criteria:}
     \item[] \quad Calculate information gain for all features in current node

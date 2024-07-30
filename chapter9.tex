@@ -73,6 +73,13 @@
 \subsection*{Loss and cost function}
 logistic loss also known as binary cross entropy:
 \[ L(f_{\mathbf{w}, b}(\mathbf{x}), y) = -y \log(f_{\mathbf{w}, b}(\mathbf{x})) - (1 - y) \log(1 - f_{\mathbf{w}, b}(\mathbf{x})) \]
+\begin{notebox}
+    recall: this loss function is derived from the maximum likelihood estimation of the logistic regression model.
+    It is also the loss function of neural networks with sigmoid activation function in the output layer.
+    You can think the output $f_{\mathbf{w}, b}(\mathbf{x})$ as $\hat{p}$, and to get $\hat{p}$, there are 
+    different approaches, but the likelihood estimation is still the same one.
+    The differences are neural networks have more parameters to compute derivatives and update the parameters.
+\end{notebox}
 \begin{minted}{python}
     from tensorflow.keras.loss import BinaryCrossentropy
     model.compile(loss=BinaryCrossentropy())
@@ -181,8 +188,8 @@ note: $a_1 + a_2 + \cdots + a_N = 1$
 
 \vspace{2em}
 \begin{minted}{python}
-    from tensorflow.keras.loss import CategoricalCrossentropy
-    model.compile(loss=CategoricalCrossentropy())
+    from tensorflow.keras.loss import SparseCategoricalCrossentropy
+    model.compile(loss=SparseCategoricalCrossentropy())
 \end{minted}
 
 \subsubsection*{Template}
@@ -232,9 +239,10 @@ Predication:
         \item Add \colorbox{mycolor}{\texttt{from\_logits=True}} to the loss function.
         \item Because the result haven't been processed with Softmax, Use \colorbox{mycolor}{\texttt{tf.nn.softmax}} to compute the probabilities.
     \end{itemize}
-    \hspace{2em}\texttt{from\_logits=True} means that the output of the model is not probabilities, but logits.
-    By applying \texttt{from\_logits=True}, the loss function will automatically apply softmax to the output of the model before computing the loss.
-    The reason for chaning the output layer activation to linear is and applying from\_logits=True is that TensorFlow can optimize the computation of the softmax 
+    \hspace{2em}\colorbox{mycolor}{\texttt{from\_logits=True}} means that the output of the model is not probabilities, but logits.
+    By applying \colorbox{mycolor}{\texttt{from\_logits=True}}, the loss function will automatically apply softmax to the output of the model before computing the loss.
+    The reason for changing the output layer activation to linear and applying \colorbox{mycolor}{\texttt{from\_logits=True}}
+    is that TensorFlow can optimize the computation of the softmax 
     and the cross-entropy loss, which is more numerically stable.
 \end{notebox}
 \par
@@ -260,7 +268,7 @@ Multilable classification is a generalization of multiclass classification, wher
     \item In multiclass classification, each instance is assigned to one and only one class.
     \item In multilabel classification, each instance can be assigned to multiple classes.
 \end{itemize}
-\par
+\noindent
 \includegraphics*[width=0.9\textwidth]{images/9.1}\par
 In this example, each image can be assigned to multiple labels.
 For example, an image can be assigned to both ``include car'', ``include bus'', and ``include pedestrian''.
@@ -275,7 +283,7 @@ while we use the softmax activation function in multi-class classification.
 
 \section{Adam Optimizer}
 \textbf{Adam} is an optimization algorithm that can be used instead of the classical 
-gradient descent procedure to update network weights iteratively based on training data.\par
+gradient descent procedure to update network weights iteratively based on training data.\\
 \includegraphics*[width=\textwidth]{images/9.2}\par
 By changing the learning rate, we can achieve better performance.\par
 \begin{minted}{python}
@@ -292,13 +300,13 @@ By changing the learning rate, we can achieve better performance.\par
 \section{Additional layer types}
 \textbf{Dense layer}: Each neuron output is a function of all the inputs.\par
 \textbf{Convolutional layer}: Each neuron output is a function of a subset of the inputs.
-Why? 1. Faster computation. 2. Need less training data (less prone to overfitting).\par
+Why? 1. Faster computation. 2. Need less training data (less prone to overfitting).\\
 \includegraphics*[width=\textwidth]{images/9.3}
 
 \section{Computation graph}
 \textbf{Computation graph} is a way to represent the computation of a neural network.
 We use forward propagation to compute the output of the neural network and use backpropagation to compute the gradients of the loss function with respect to the parameters of the neural network.
-The essence of backpropagation is \textbf{``Chain Rule''} in calculus.\par
+The essence of backpropagation is \textbf{``Chain Rule''} in calculus.\\
 \includegraphics*[width=\textwidth]{images/9.4}
 \includegraphics*[width=\textwidth]{images/9.5}
 \par
