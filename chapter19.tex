@@ -1,0 +1,190 @@
+\chapter{Continuous State Space}
+\section{Continuous state examples}
+Continuous state space is a state space where the state can take on any real value within a range.
+The numbers of states in a continuous state space are infinite, which makes it impossible to represent the state space as a table.
+To model it, we can represent each state as a vector of real numbers, and use a function to approximate the Q-function.
+
+In the truck example, the state space is continuous because the truck can be at any position on the road.
+\begin{equation*}
+    s = \begin{bmatrix}
+        \text{Position} \\
+        \text{Speed}
+    \end{bmatrix}
+    = \begin{bmatrix}
+        x\\
+        y\\
+        \theta\\
+        \dot{x}\\
+        \dot{y}\\
+        \dot{\theta}
+    \end{bmatrix}
+\end{equation*}
+In this example, $x$, $y$ is the position of the truck, 
+$\theta$ is the angle of the truck, $\dot{x}$, $\dot{y}$, $\dot{\theta}$ 
+is the corresponding speed of the truck.
+
+In the aircraft example, the state space:
+\begin{equation*}
+    s = \begin{bmatrix}
+        \text{Position} \\
+        \text{Heading} \\
+        \text{Speed}
+    \end{bmatrix}
+    = \begin{bmatrix}
+        x\\
+        y\\
+        z\\
+        \phi\\
+        \theta\\
+        \omega\\
+        \dot{x}\\
+        \dot{y}\\
+        \dot{z}\\
+        \dot{\phi}\\
+        \dot{\theta}\\
+        \dot{\omega}
+    \end{bmatrix}
+\end{equation*}
+In this example, $x$, $y$ is the position of the aircraft horizontally, 
+$z$ is the height, $\phi$ is the roll angle, $\theta$ is the pitch angle, 
+$\omega$ is the yaw angle, $\dot{x}$, $\dot{y}$, $\dot{z}$ is the corresponding 
+speed of the aircraft, $\dot{\phi}$, $\dot{\theta}$, $\dot{\omega}$ is the corresponding angular velocity 
+of the aircraft.
+
+\subsection*{Lunar lander example}
+The lunar lander example is a classic reinforcement learning problem.\\
+\begin{center}
+    \includegraphics*[width=0.45\textwidth]{images/19.2}
+\end{center}
+
+The available actions are:
+\begin{itemize}
+    \item Do nothing
+    \item left thruster
+    \item main thruster
+    \item right thruster
+\end{itemize}
+
+The state space is continuous, the state is represented as a vector:
+\begin{equation*}
+    s = \begin{bmatrix}
+        x\\
+        y\\
+        \dot{x}\\
+        \dot{y}\\
+        \theta\\
+        \dot{\theta}\\
+        \text{l}\\
+        \text{r}
+    \end{bmatrix}
+\end{equation*}
+$x$, $y$ is the position of the lunar lander, $\dot{x}$, $\dot{y}$ is the speed of the lunar lander,
+$\theta$ is the shifting angle of the lunar lander, $\dot{\theta}$ is the angular velocity of the lunar lander,
+$\text{l}$ and $\text{r}$ means the left and right leg of the lunar lander, 
+1 if the leg is touching the ground, 0 otherwise.
+
+\subsubsection*{Reward function}
+The reward function is defined as:
+\begin{itemize}
+    \item Getting to the landing pad: +100 points
+    \item Additional reward for moving toward/away from the landing pad.
+    \item Crash: -100 points
+    \item Soft landing: +100 points
+    \item Leg contact with the ground: +10 points
+    \item Using the main engine: -0.3 points
+    \item Using the side engine: -0.03 points
+\end{itemize}
+
+\subsubsection*{Goal}
+Learn a policy $\pi$ that given
+\begin{equation*}
+    s = \begin{bmatrix}
+        x\\
+        y\\
+        \dot{x}\\
+        \dot{y}\\
+        \theta\\
+        \dot{\theta}\\
+        \text{l}\\
+        \text{r}
+    \end{bmatrix}
+    \qquad \gamma = 0.985
+\end{equation*}
+picks action $a = \pi(s)$ so as to maximize the return.
+
+\section{Deep reinforcement learning}
+\noindent 
+\includegraphics*[width=\textwidth]{images/19.3}
+
+The input is the combination of the state and the action. State is the same as the state vector in the continuous state space,
+and the action is the one-hot encoding of the action. The output is the Q-value of the state-action pair.
+
+Like supervised learning, we can use a neural network to approximate the Q-function. $\mathbf{x}$ 
+is the input, $y$ is $Q(s,a)$. Neural network can learn the mapping $\mathbf{x} \rightarrow y$.
+
+\subsection*{Learning algorithm}
+\begin{thmbox}{Deep Q-learning (DQN)}{Deep Q-learning}
+    \begin{itemize}
+        \item Initialize nerual network randomly as guess of $Q(s,a)$
+        \item Repeat:
+        \begin{itemize}
+            \item Take actions in the lunar lander, get tuple $(s,a,R(s),s')$
+            \item Store 10,000 most recent $(s,a,R(s),s')$ tuples (\textbf{Replay Buffer})
+            \item Train nerual network:
+            \begin{itemize}
+                \item Create training set of 10,000 examples 
+                using $x = (s,a)$ and $y = R(s) + \gamma\max \limits_{a'}Q(s',a')$
+                \item Train $Q_{\mathrm{new}}$ such that $Q_{\mathrm{new}}(s,a) \approx y$
+            \end{itemize}
+            \item Update $Q(s,a) \leftarrow Q_{\mathrm{new}}(s,a)$
+        \end{itemize}
+    \end{itemize}
+\end{thmbox}
+
+\section{Algorithm refinement}
+\subsection*{Improved neural network architecture}
+\noindent
+\includegraphics*[width=\textwidth]{images/19.4}
+
+The input is just the state vector, and the output is multiple Q-values for each action.
+This architecture is more efficient than the previous one, because the previous one has to calculate the Q-value for each action separately and
+then combine them. Meanwhile, this architecture can better combine with the Bellman equation formula.
+
+\subsection*{$\varepsilon$-greedy policy}
+How to choose actions while still learning?
+\begin{thmbox}{$\varepsilon$-greedy}{greedy}
+    In some state, apply $\varepsilon$-greedy policy ($\varepsilon = 0.05$)
+    \begin{description}
+        \item[Exploraion] With probability $\varepsilon$(0.05), pick an action $a$ randomly.
+        \item[Exploitation] With probability $1-\varepsilon$(0.95), pick the best action $a = \mathop{\mathrm{argmax}} \limits_{a} Q(s,a)$.  
+    \end{description}
+    Although the policy is called $\varepsilon$-greedy, the ``greedy'' part is $1-\varepsilon$ (0.95).
+
+    To get better results, anneal $\varepsilon$ over time. Start with $\varepsilon = 1$, decrease $\varepsilon$ over time.
+\end{thmbox}
+
+\subsection*{Mini-batch}
+Mini-batch training is used both in supervised learning and reinforcement learning.
+
+When the training set is large, the training process is computatuionally expensive and slow. 
+Hence, we can use mini-batch training to speed up the training process. Mini-batch is a subset of the training set.
+Instead of running gradient descent on the entire training set, we run it on a mini-batch.\\
+\includegraphics*[width=\textwidth]{images/19.5}
+\includegraphics*[width=\textwidth]{images/19.6}
+
+The learning curve of mini-batch training is not as smooth as the full batch training, 
+the cost may increase at some ponit,
+but it will finally converges to the same result as the full batch training.\\
+\includegraphics*[width=\textwidth]{images/19.7}
+
+\subsection*{Soft update}
+\begin{thmbox}{Soft update}{softupdate}
+    \begin{itemize}
+        \item Update the target network slowly
+        \item Instead of updating the target network with the $Q_{\mathrm{new}}$ directly, 
+        we update the target network with a fraction of the $Q_{\mathrm{new}}$.
+        \item $W := 0.99W + 0.01W_{\mathrm{new}}$
+        \item $B := 0.99B + 0.01B_{\mathrm{new}}$
+    \end{itemize}
+    This will make the training process more stable.
+\end{thmbox}

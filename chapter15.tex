@@ -1,0 +1,85 @@
+\chapter{Implementation Details}
+\section{Mean normalization}
+Consider this situation:\\
+\includegraphics*[width=\textwidth]{images/15.1}
+
+Eve didn't rate any movies, so her predicted ratings are all 0. Because of the regularization term, 
+her parameters are all 0. So, her predicted ratings for all movies are 0.
+
+To avoid this, we can use mean normalization. Subtract the mean rating of a movie from the user's rating.
+And add the mean rating to the predicted rating.
+
+\begin{itemize}
+    \item Represent the data as a matrix $Y$ where $Y_{i, j}$ is the rating of movie $i$ by user $j$.
+    \item Compute the mean of the ratings of movie $i$ (excluding missing values), $\mu_i$. This is same to say 
+    compute the mean of each row of the matrix $Y$.
+    \item For each user $j$ who rated movie $i$, set $Y_{i, j} = Y_{i, j} - \mu_i$.
+    \item Learn parameters on this new matrix.
+    \item To predict the rating of movie $i$ by user $j$, add $\mu_i$ to the predicted value.($w^{(j)} \cdot x^{(i)} + b^{(j)} + \mu_i$)
+\end{itemize}
+\includegraphics*[width=\textwidth]{images/15.2}
+
+\begin{notebox}
+    \hspace*{2em}In the above example, for user who didn't rate any movies, the predicted ratings are not 0 but the mean rating of the movie.
+
+    \hspace*{2em}The mean normalization can be also applied to the column of the matrix $Y$, while in this case, it is more appropriate to use the mean of the user's ratings.
+    In practical applications, we choose which mean to use based on the context.
+\end{notebox}
+
+\section{Implementation in TensorFlow}
+TensorFlow has a powerful tool to automatically compute the derivatives of a function with respect to its parameters.
+This is called \textbf{auto diff (automatic differentiation)}.
+
+\begin{codebox}{auto diff}{auto diff}
+\begin{minted}{python}
+    w = tf.Variable(3.0)
+    x = 1.0
+    y = 1.0
+    alpha = 0.01
+
+    iterations = 30
+    for iter in range(iterations):
+        with tf.GradientTape() as tape:
+            fwb = w * x
+            cost = (fwb - y) ** 2
+        grad = tape.gradient(cost, w)
+        w.assign(w - alpha * grad)
+\end{minted}
+\end{codebox}
+
+Recall that there is an optimizer called ``Adam'' in TensorFlow. It can change the learning rate during training.
+
+\begin{codebox}{Adam optimizer}{Adam optimizer}
+\begin{minted}{python}
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)
+
+    iterations = 200
+    for iter in range(iterations):
+        with tf.GradientTape() as tape:
+            cost = cofiCostFunc(X, w, b, Ynorm, R, 
+                num_users, num_movies, num_features, lambda_)
+        grads = tape.gradient(cost, [X, w, b])
+        optimizer.apply_gradients(zip(grads, [X, w, b]))
+\end{minted}
+\end{codebox}
+
+\section{Related items}
+The feature $x^{(i)}$ of item $i$ can show what the item is about.
+To find other items related to item $i$, we can find the items with similar features.
+
+i.e. Find item $k$ such that $||x^{(i)} - x ^{(k)}||$ is small. (Euclidean distance or norm)
+$||x^{(k)} - x^{(i)}||^2 = \sum_{l=1}^{n}\left(x_l^{(k)} - x_l^{(i)}\right)^2$.
+
+\subsection*{Limitations of collaborative filtering}
+\begin{itemize}
+    \item Cold start problem:
+    \begin{itemize}
+        \item It's hard to recommend new items because there are no ratings for them. 
+        \item It's hard to recommend items to new users because there are few ratings from them.
+    \end{itemize}
+    \item Use side information about items or users:
+    \begin{itemize}
+        \item item: movie genres, movie stars, movie directors, etc.
+        \item user: Demographic information (age, gender, etc.), social network information, etc.
+    \end{itemize}
+\end{itemize}

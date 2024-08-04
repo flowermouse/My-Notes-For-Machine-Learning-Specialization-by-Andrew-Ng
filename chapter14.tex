@@ -1,0 +1,145 @@
+\chapter{Collaborative Filtering}
+\section{Making recommendations}
+\subsection*{Movie ratings example}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{ccccc}
+        \toprule
+        & Alice & Bob & Carol & Dave \\
+        \midrule
+        Love at last & 5 & 5 & 0 & 0 \\
+        Romance forever & 5 & ? & ? & 0 \\
+        Cute puppies of love & ? & 4 & 0 & ? \\
+        Nonstop car chases & 0 & 0 & 5 & 4 \\
+        Swords vs karate & 0 & 0 & 5 & ? \\
+        \bottomrule
+    \end{tabular}
+    \caption{User rates movies using 0-5 stars}
+\end{table}
+
+\begin{notebox}
+    \begin{align*}
+    n_u &= \text{number of users}\\
+    n_m &= \text{number of movies}\\
+    r(i,j) &= \text{1 if user $j$ has rated movie $i$}\\
+    y(i,j) &= \text{rating given by user $j$ to movie $i$}\\
+    \end{align*}
+    \hspace*{2em}In this case:\\
+    \hspace*{4em}$n_u = 4$,   $n_m = 5$,   $r(1,1) = 1$,   $y(3,1) = 0$.
+\end{notebox}
+
+\section{Using per-item features}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{ccccccc}
+        \toprule
+        & Alice & Bob & Carol & Dave & $x_1$(romance) & $x_2$(action)\\
+        \midrule
+        Love at last & 5 & 5 & 0 & 0 & 0.9 & 0 \\
+        Romance forever & 5 & ? & ? & 0 & 1.0 & 0.01 \\
+        Cute puppies of love & ? & 4 & 0 & ? & 0.99 & 0 \\
+        Nonstop car chases & 0 & 0 & 5 & 4 & 0.1 & 1.0 \\
+        Swords vs karate & 0 & 0 & 5 & ? & 0 & 0.9 \\
+        \bottomrule
+    \end{tabular}
+    \caption{assuming we have features for each movie}
+\end{table}
+
+For user $j$: Predict user $j$'s rating for movie $i$ as $w^{(j)} \cdot x^{(i)} + b^{(j)}$,
+where $w^{(j)}$ is the parameter vector for user $j$ and $x^{(i)}$ is the feature vector for movie $i$.
+It's just like linear regression, but we have different parameters for each user.
+
+\begin{dfnbox}{Cost function}{c}
+    \textbf{Notation:}
+    \begin{align*}
+        r(i, j) &= 1 \quad \text{if user $j$ has rated movie $i$ (0 otherwise)}\\
+        y^{(i, j)} &= \text{rating by user $j$ on movie $i$ (if defined)}\\
+        x^{(i)} &= \text{feature vector for movie $i$}\\
+        w^{(j)}, b^{(j)} &= \text{parameter vector and bias for user $j$}\\
+        m^{(j)} &= \text{number of movies rated by user $j$}
+    \end{align*}
+    \textbf{For user $j$, the cost function is:}
+    \begin{equation}
+        J(w^{(j)}, b^{(j)}) = \frac{1}{2m^{(j)}} \sum_{i:r(i,j)=1} \left( w^{(j)} \cdot x^{(i)} + b^{(j)} - y^{(i,j)} \right)^2 + 
+        \frac{\lambda}{2m^{(j)}} \sum_{k=1}^{n} (w_k^{(j)})^2
+    \end{equation}
+    \hspace{2em}The second term is the regularization term, $n$ is the number of features.\\
+    \textbf{Cost function for all users:}\\
+    \begin{align}
+        J\left(\begin{matrix} w^{(1)} & \ldots & w^{(n_u)}\\ b^{(1)} & \ldots & b^{(n_u)} \end{matrix}\right) &= 
+        \frac{1}{2} \sum_{j=1}^{n_u} \sum_{i:r(i,j)=1}
+         \left( (w^{(j)})^T x^{(i)} + b^{(j)} - y^{(i,j)} \right)^2 + 
+         \frac{\lambda}{2} \sum_{j=1}^{n_u} \sum_{k=1}^{n} (w_k^{(j)})^2
+    \end{align}
+    \hspace{2em}To learn $w^{(j)}, b^{(j)}$ for all users, minimize $J$, we can ignore the constant factor $m^{(j)}$.
+\end{dfnbox}
+
+\section{Collaborative filtering algorithm}
+\subsection*{Cost function for $x$}
+\begin{dfnbox}{Cost function}{cf}
+    \textbf{Cost function for single movie $i$:}
+    \begin{equation}
+        J(x^{(i)}) = \frac{1}{2} \sum_{j:r(i,j)=1} \left( w^{(j)} \cdot x^{(i)} + b^{(j)} - y^{(i,j)} \right)^2 + 
+        \frac{\lambda}{2} \sum_{k=1}^{n} (x_k^{(i)})^2
+    \end{equation}
+    \textbf{Cost function for all movies:}
+    \begin{equation}
+        J\left(x^{(1)}, \ \ldots \ ,x^{(n_m)}\right) = 
+        \frac{1}{2} \sum_{i=1}^{n_m} \sum_{j:r(i,j)=1}
+         \left( w^{(j)} \cdot x^{(i)} + b^{(j)} - y^{(i,j)} \right)^2 + 
+         \frac{\lambda}{2} \sum_{i=1}^{n_m} \sum_{k=1}^{n} (x_k^{(i)})^2
+    \end{equation}
+\end{dfnbox}
+
+\subsection*{Collaborative filtering algorithm}
+Above cost function is for minimizing $w^{(j)}, b^{(j)}$ and $x^{(i)}$. Now, we can design a
+new algorithm to learn all these parameters simultaneously.
+\begin{thmbox}{Collaborative filtering}{c f}
+    \hspace*{2em}Cost function to learn $w^{(1)}, b^{(1)}, \cdots, w^{(n_u)}, b^{(n_u)}$:
+    \begin{equation*}
+        \min \limits_{w^{(1)}, b^{(1)}, \cdots, w^{(n_u)}, b^{(n_u)}}
+        \frac{1}{2} \sum_{j=1}^{n_u} \sum_{i:r(i,j)=1}
+         \left(w^{(j)} \cdot x^{(i)} + b^{(j)} - y^{(i,j)} \right)^2 + 
+         \frac{\lambda}{2} \sum_{j=1}^{n_u} \sum_{k=1}^{n} (w_k^{(j)})^2
+    \end{equation*}
+    \hspace*{2em}Cost function to learn $x^{(1)}, \cdots, x^{(n_m)}$:
+    \begin{equation*}
+        \min \limits_{x^{(1)}, \cdots, x^{(n_m)}}
+        \frac{1}{2} \sum_{i=1}^{n_m} \sum_{j:r(i,j)=1}
+         \left(w^{(j)} \cdot x^{(i)} + b^{(j)} - y^{(i,j)} \right)^2 + 
+         \frac{\lambda}{2} \sum_{i=1}^{n_m} \sum_{k=1}^{n} (x_k^{(i)})^2
+    \end{equation*}
+    \hspace*{2em}To learn $w^{(j)}, b^{(j)}$ and $x^{(i)}$ simultaneously, we can minimize both cost functions:
+    \begin{align}
+        &\min \limits_{\substack{w^{(1)}, \cdots, w^{(n_u)} \\ b^{(1)}, \cdots, b^{(n_u)} \\ x^{(1)}, \cdots, x^{(n_m)}}}
+        J(w, b, x) = \\ \nonumber
+        &\frac{1}{2} \sum_{(i,j):r(i,j)=1}
+         \left(w^{(j)} \cdot x^{(i)} + b^{(j)} - y^{(i,j)} \right)^2 + 
+         \frac{\lambda}{2} \sum_{j=1}^{n_u} \sum_{k=1}^{n} (w_k^{(j)})^2 + 
+         \frac{\lambda}{2} \sum_{i=1}^{n_m} \sum_{k=1}^{n} (x_k^{(i)})^2
+    \end{align}
+\end{thmbox}
+
+\subsection*{Gradient descent}
+Having the cost function, we can use gradient descent to minimize it.
+\begin{thmbox}{Gradient descent}{g}
+repeat\{\\
+    \hspace*{2em}$w_i^{(j)} := w_i^{(j)} - \alpha \frac{\partial}{\partial w_i^{(j)}}J(w, b, x)$\\
+    \hspace*{2em}$b^{(j)} := b^{(j)} - \alpha \frac{\partial}{\partial b^{(j)}}J(w, b, x)$\\
+    \hspace*{2em}$x_k^{(i)} := x_k^{(i)} - \alpha \frac{\partial}{\partial x_k^{(i)}}J(w, b, x)$\\
+\}
+\end{thmbox}
+
+\section{Binary labels}
+Previously: Predict $y^{(i, j)}$ as $w^{(j)}\cdot x^{(i)} + b^{(j)}$
+
+For binary labels: Predict the probability that $y^{(i, j)} = 1$ by $g(w^{(j)}\cdot x^{(i)} + b^{(j)})$, 
+where $g(z) = \frac{1}{1 + e^{-z}}$ is the sigmoid function.
+
+\begin{thmbox}{Cost function for binary labels}{c}
+    \begin{align}
+        f_{(w, b, x)}(x) &= g(w^{(j)}\cdot x^{(i)} + b^{(j)})\\
+        L(f_{(w, b, x)}(x), y) &= -y^{(i, j)} \log(f_{(w, b, x)}(x)) - (1 - y^{(i, j)}) \log(1 - f_{(w, b, x)}(x))\\
+        J(w, b, x) &= \sum_{(i,j):r(i, j) = 1} L(f_{(w, b, x)}(x), y)
+    \end{align} 
+\end{thmbox}

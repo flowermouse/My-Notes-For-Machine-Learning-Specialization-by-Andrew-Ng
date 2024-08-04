@@ -1,0 +1,70 @@
+\chapter{Content-based filtering}
+\section{Prediction}
+Conten-based filtering is based on features of user and item features. The same definition as before:
+$r(i ,j) = 1$ if user $j$ has rated movie $i$ (0 otherwise). $y(i, j)$ is the rating of item $i$ by user $j$.
+
+However, there is no need to learn parameters $w^{(j)}$ and $b^{(j)}$ for each user $j$. Instead, we use a user features
+vector $\mathbf{x}_{u}^{(j)}$ to represent user $j$. Similarly, we use an item features vector $\mathbf{x}_{m}^{(i)}$ to represent movie $i$.
+Note that the dimensions of the user and item features vectors may be different.\\
+\includegraphics*[width=\textwidth]{images/16.1}
+
+Predict rating of movie $i$ by user $j$: \colorbox{amzexboxcolor}{$\mathbf{v}_{u}^{(j)} \cdot \mathbf{v}_m^{(i)}$}.
+The $\mathbf{v}_{u}^{(j)}$ is computed from the user features vector $\mathbf{x}_{u}^{(j)}$ 
+and the $\mathbf{v}_m^{(i)}$ is computed from the item features vector $\mathbf{x}_{m}^{(i)}$.
+Because we need to take dot product of two vectors, the dimensions of the two vectors must be the same.
+
+\subsection*{Nerual network architecture}
+To compute the $\mathbf{v}_{u}^{(j)}$ and $\mathbf{v}_m^{(i)}$, we can use a neural network architecture.\\
+\includegraphics*[width=\textwidth]{images/16.2}
+
+By taking the dot product of the output of the two neural networks, we can predict the rating of movie $i$ by user $j$.
+Because we want to keep the dimensions of the two vectors the same, 
+we need to set the number of units in the output layer of the two neural networks to be the same.
+This is a good example of combining two separate neural networks to make a prediction. (That's one of the 
+advantages of neural networks compared to random forests model.)\\
+\begin{center}
+    \includegraphics*[width=0.6\textwidth]{images/16.3}
+\end{center}
+
+Similarly, set the cost function $J$ to be:
+\begin{equation*}
+    J = \sum_{(i, j): r(i, j) = 1} \left( \mathbf{v}_{u}^{(j)} \cdot \mathbf{v}_m^{(i)} - y(i, j) \right)^2 + \text{NN regularization terms}
+\end{equation*}
+
+To find movie $k$ that are similar to movie $i$, we can compute the distance between the item features vectors $\mathbf{x}_{m}^{(i)}$ and $\mathbf{x}_{m}^{(k)}$:
+$||\mathbf{v}_{m}^{(k)} - \mathbf{v}_{m}^{(i)}||$, the smaller the distance, the more similar the two movies are.
+
+\section{Recommendations}
+\begin{enumerate}
+    \item \textbf{Retrieval}
+    \begin{enumerate}
+        \item Generate large lists of plausible item candidates:
+        \begin{enumerate}
+            \item For each of the last 10 movies watched by the user, find 10 similar movies.
+            \item For most viewed 3 genres, find 10 top movies.
+            \item Find top 20 popular movies in the country.
+            \item $\cdots$
+        \end{enumerate}
+        \item Combine retrieved items into list, removing duplicates and items already watched.
+    \end{enumerate}
+    \item \textbf{Ranking}
+    \begin{enumerate}
+        \item Take retrieved list and rank items by predicted ratings using the model.
+        \item Display top $N$ items to user.
+    \end{enumerate}
+\end{enumerate}
+
+\begin{notebox}
+\hspace{2em}Retrieving more items results in better performance, but slower recommendations.
+To analyse/optimize the trade-off, carry out offline experiments
+to see if retrieving additional items results in more relevant recommendations 
+(i.e., $p\left( {y}^{\left( i,j\right) }\right)  = 1 $ of items displayed to user are higher).
+\end{notebox}
+
+\subsection*{Ethical use of recommender systems}
+\noindent
+\includegraphics*[width=\textwidth]{images/16.4}
+
+\section{Implementation in TensorFlow}
+\noindent
+\includegraphics*[width=\textwidth]{images/16.5}

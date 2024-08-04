@@ -1,4 +1,14 @@
-# My Notes For "Machine Learning Specialization" by Andew Ng 
+# My Notes For "Machine Learning Specialization" by Andrew Ng 
+
+<img src="images/cover.png" style="zoom:50%;" />
+
+<img src="images/content1.png" style="zoom:50%;" />
+
+<img src="images/content2.png" style="zoom:50%;" />
+
+<img src="images/content3.png" style="zoom:50%;" />
+
+<img src="images/content4.png" style="zoom:50%;" />
 
 ## Language 
 

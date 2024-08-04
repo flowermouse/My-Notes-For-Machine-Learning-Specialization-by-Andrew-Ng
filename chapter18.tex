@@ -1,0 +1,93 @@
+\chapter{Reinforcement Learning Introduction}
+\section{What is reinforcement learning?}
+Reinforcement learning is a type of machine learning that allows us
+to create agents that learn to take actions in an environment in order to
+maximize some notion of cumulative reward. The agent learns to achieve a goal in an uncertain, 
+potentially complex environment. In reinforcement learning, an agent interacts with an environment 
+by taking actions and receiving feedback, in the form of rewards or penalties. 
+The agent then uses this feedback to learn how to interact with the environment in the future.
+
+Below are some imortant concepts in reinforcement learning:
+    \subsection*{Return}
+    The return is the sum of rewards that the agent receives over time. 
+    The return depends on the sequence of actions taken by the agent.\\
+    \begin{center}
+    \includegraphics*[width=0.8\textwidth]{images/17.1}
+    \end{center}
+    \subsection*{Policy}
+    The policy is a function $\pi(s) = a$ mapping from states to actions, which tells you what action $a$ to take in 
+    a given state $s$. The policy can be deterministic or stochastic.\\
+    \begin{center}
+    \includegraphics*[width=0.8\textwidth]{images/17.2}
+    \end{center}
+    \subsection*{Discount factor}
+    The discount factor $\gamma$ is a value between 0 and 1 that determines how much the agent values future rewards.
+    If $\gamma$ is close to 0, the agent will focus on immediate rewards. If $\gamma$ is close to 1, the agent will
+    be more concerned with long-term rewards.
+    \subsection*{Rewards}
+    The rewards are the feedback that the agent receives from the environment. Rewards often means the immediate
+    response that the agent get being in a state.
+
+\subsection*{The goal of reinforcement learning}
+The goal of reinforcement learning is to find the policy $\pi$ that maximizes the expected return.
+\subsection*{Some examples of reinforcement learning}
+\noindent
+\includegraphics*[width=\textwidth]{images/17.3}
+
+\section{Markov Decision Process}
+A Markov Decision Process (MDP) is a mathematical framework for modeling 
+decision-making in situations where outcomes are partly random and partly under the control of a 
+decision maker. An MDP consists of the following components:
+\begin{itemize}
+    \item An environment with a set of states $S$.
+    \item An agent with a policy $\pi$ and a set of actions $A$.
+    \item A transition function $P(s, a, s')$ that gives the probability of transitioning from state $s$ to state $s'$ 
+    by taking action $a$.
+    \item A reward function $R(s, a, s')$ that gives the reward received for transitioning from state $s$ to state $s'$ by taking action $a$.
+    \item A discount factor $\gamma$.
+\end{itemize}
+\includegraphics*[width=\textwidth]{images/17.4}
+
+\section{State action value function}
+\begin{dfnbox}{Q-function}{Q-function}
+    \hspace*{2em}The state-action value function $Q(s, a)$ is the expected return of taking action $a$ in state $s$.
+    It is also called the Q-function.
+    
+    \hspace*{2em}$Q(s, a) == \text{Return of state s}$ iff start in state $s$, take action $a$ (once), then behave optimally after that.\\
+    \begin{center}
+    \includegraphics*[width=0.8\textwidth]{images/17.5}
+    \end{center}
+\end{dfnbox}
+\subsection*{Picking actions}
+The best possible return from state $s$ is $\max \limits_{a} Q(s, a)$,
+The best possible action in state $s$ is $\mathop{\mathrm{argmax}} \limits_{a} \ Q(s, a)$.
+Optimal $Q$ function is noted as $Q^*(s, a)$.
+
+\section{Bellman Equation}
+\begin{thmbox}{Bellman Equation}{Bellman Equation}
+    \begin{description}
+        \item[$s$] current state
+        \item[$a$] current action
+        \item[$s'$] state after taking action $a$ in state $s$
+        \item[$a'$] action in state $s'$
+        \item[$R(s)$] reward of state $s$ 
+    \end{description}
+    \begin{equation}
+        Q(s, a) = R(s) + \gamma \max \limits_{a'} Q(s', a')
+    \end{equation}
+\end{thmbox}
+\subsection*{Stochastic environment}
+Stochastic environment means that the transition function $P(s, a, s')$ is not deterministic, which is to say that
+the mars rover may sometimes slip on a rock and not move as expected. 
+
+The definition of ``Return'' has a more general form:
+\begin{equation}
+    \text{Expected Return} = E\left[R_1 + \gamma R_2 + \gamma^2 R_3 + \gamma^3 R_4 + \cdots \right]
+\end{equation}
+
+The $E$ means the expectation of the sum of rewards. The rewards are random variables, so the return is also a random variable.
+
+In the Bellman Equation, $s'$ is also a random variable, here is the general version of the Bellman Equation:
+\begin{equation}
+    Q(s, a) = R(s) + \gamma E\left[\max \limits_{a'} Q(s', a')\right]
+\end{equation}

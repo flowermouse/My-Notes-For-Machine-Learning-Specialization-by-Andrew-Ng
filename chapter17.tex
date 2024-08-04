@@ -1,0 +1,93 @@
+\chapter{Principal Component Analysis}
+\section{Reducing the number of the features}
+What PCA does is to find a lower-dimensional surface onto which to project the data,
+so as to minimize the projection error.
+By using PCA, we can reduce the dimension of the data, and make it easier to visualize and understand.\\
+\includegraphics*[width=0.5\textwidth]{images/pca1}
+\includegraphics*[width=0.5\textwidth]{images/pca2}
+\vspace{2em}
+\includegraphics*[width=0.5\textwidth]{images/pca3}
+\includegraphics*[width=0.5\textwidth]{images/pca4}
+
+\section{PCA Algorithm}
+\subsection*{Data preprocessing}
+Before applying PCA, it is important to first normalize to have zero mean.
+Apply feature scaling and mean normalization to the data so that each feature has a equal influence on the computation of the principal components.
+(for example, min-max normalization or z-score normalization)
+\subsection*{Projection}
+``Project'' examples onto the new axis.
+The new axis are the principal components.
+It should have variance as large as possible so that can capture info of the orignal data.
+\begin{center}
+    \includegraphics*[width=0.8\textwidth]{images/p1}
+\end{center}
+\par
+Looking at the 2D plot, we can see that the data is spread out along the direction of the principal component.
+\begin{center}
+    \includegraphics*[width=0.8\textwidth]{images/p2}
+    \includegraphics*[width=0.8\textwidth]{images/p3}
+\end{center}
+\par
+
+To calculate the coordinates of the data points in the new basis, we can use the dot product:
+assuming $\mathbf{x}$ is the orignal data, and $\mathbf{u}$ is the principal component,
+and $\mathbf{u}$ is the unit vector which has a length of 1.
+Then the length of projection of $\mathbf{x}$ onto $\mathbf{u}$ is $\mathbf{x} \cdot \mathbf{u}$.
+And we can multiply $\mathbf{u}$ by $\mathbf{x} \cdot \mathbf{u}$ to get the projection vector.
+This step is called reconstruction.
+\begin{center}
+    \includegraphics*[width=0.8\textwidth]{images/p4}
+\end{center}
+\par
+
+If there are pricipal components more than 1, we can project the data onto the first $k$ principal components.
+We call them the first $k$ principal components. And each of them is orthogonal to the others.
+
+\subsection*{Difference between PCA and Linear Regression}
+\begin{itemize}
+    \item In linear regression, we are trying to minimize the error between the prediction and the actual value.
+    \item In PCA, we are trying to minimize the projection error.
+\end{itemize}
+\par
+
+And the difference is more obvious in higher dimensions.\par
+Below is one example of the difference between PCA and linear regression:
+\begin{center}
+    \includegraphics*[width=0.8\textwidth]{images/p8}
+\end{center}
+
+\section{PCA in scikit learn}
+\begin{notebox}
+    the ``fit'' method in sklearn already includes the step of mean normalization.
+\end{notebox}
+\begin{minted}{python}
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.decomposition import PCA
+
+    X = np.array([[1, 1], [2, 1], [3, 2], [-1, -1], [-2, -1], [-3, -2]])
+    plt.scatter(X[:, 0], X[:, 1])
+    plt.show()
+
+    pca = PCA(n_components=1)
+    pca.fit(X)
+    pca.explained_variance_ratio_
+
+    X_pca = pca.transform(X)
+    X_pca
+
+    inverse = pca.inverse_transform(X_pca)
+    plt.scatter(inverse[:, 0], inverse[:, 1])
+    plt.show()
+\end{minted}
+
+\subsection*{Application of PCA}
+\begin{itemize}
+    \item Data compression
+    \item Visualization
+    \item Speeding up learning algorithms
+\end{itemize}
+
+
+
+
